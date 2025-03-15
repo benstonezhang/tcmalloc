@@ -112,10 +112,17 @@ struct NullOomPolicy {
 // MallocOomPolicy: sets errno to ENOMEM and returns nullptr
 struct MallocOomPolicy {
   template <typename Policy, typename Pointer = typename Policy::pointer_type>
+#if 0
   static inline Pointer handle_oom(size_t size) {
     errno = ENOMEM;
     return Policy::as_pointer(nullptr, 0);
   }
+#else
+  static ABSL_ATTRIBUTE_NOINLINE ABSL_ATTRIBUTE_NORETURN Pointer
+    handle_oom(size_t size) {
+    CrashWithOOM(size);
+  }
+#endif
 };
 
 // CppOomPolicy: terminates the program
